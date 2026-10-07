@@ -1,8 +1,21 @@
 "use client";
 import React, { useState } from "react";
 import ProductModal from "./ProductModal";
+import SizeManagementModal from "./SIzeMangementModel";
+import ColorManagementModal from "./ColorManagementModal";
 import { useCart } from "./CartContext";
 import { getToken } from "../lib/auth";
+import { Eye } from "lucide-react";
+
+interface SizeOption {
+  size: string;
+  available: boolean;
+}
+
+interface ColorOption {
+  color: string;
+  available: boolean;
+}
 
 interface Product {
   _id: string;
@@ -11,8 +24,11 @@ interface Product {
   category?: string;
   description?: string;
   color?: string;
+  productNumber?: string;
   images?: string[];
   soldOut?: boolean;
+  sizes?: SizeOption[];
+  colors?: ColorOption[];
 }
 
 interface Props {
@@ -21,10 +37,25 @@ interface Props {
   onUpload: (productId: string, files: File[]) => void;
   onClick?: () => void;
   onToggleSoldOut?: (productId: string, soldOut: boolean) => void;
+  onSizeUpdate?: (productId: string, updatedSizes: SizeOption[]) => void;
+  onColorUpdate?: (productId: string, updatedColors: ColorOption[]) => void;
 }
 
-const ProductCard: React.FC<Props> = ({ product, isAdmin, onUpload, onClick, onToggleSoldOut }) => {
+const ProductCard: React.FC<Props> = ({
+  product,
+  isAdmin,
+  onUpload,
+  onClick,
+  onToggleSoldOut,
+  onSizeUpdate,
+  onColorUpdate,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
+  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const { addToCart } = useCart();
 
   const firstImage =
@@ -32,176 +63,159 @@ const ProductCard: React.FC<Props> = ({ product, isAdmin, onUpload, onClick, onT
       ? product.images[0]
       : "/placeholder.png";
 
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm("Delete this product?")) return;
+  const availableSizes = product.sizes?.filter((s) => s.available) || [];
+  const availableColors = product.colors?.filter((c) => c.available) || [];
 
-    try {
-      const token = getToken();
-      if (!token) {
-        alert("❌ Please login to delete products");
-        return;
-      }
-
-      console.log("🔄 Attempting to delete product:", product._id);
-      
-      const res = await fetch(`https://dabeez-backend.fly.dev/products/${product._id}`, {
-        method: "DELETE",
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-      });
-
-      console.log("🗑️ Delete response status:", res.status);
-
-      if (res.ok) {
-        alert("✅ Product deleted successfully!");
-        window.location.reload();
-      } else {
-        if (res.status === 401) {
-          alert("❌ Unauthorized! Please login again.");
-        } else {
-          alert(`❌ Delete failed: ${res.status}`);
-        }
-      }
-    } catch (err) {
-      console.error("Delete failed", err);
-      alert("❌ Network error: Failed to delete product");
-    }
-  };
-
-  const handleToggleSoldOut = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newSoldOutStatus = !product.soldOut;
-    
-    try {
-      const token = getToken();
-      if (!token) {
-        alert("❌ Please login to update product status");
-        return;
-      }
-
-      console.log("🔄 Toggling sold out status:", product._id, newSoldOutStatus);
-      
-      const res = await fetch(`https://dabeez-backend.fly.dev/products/${product._id}`, {
-        method: "PUT",
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ soldOut: newSoldOutStatus })
-      });
-
-      console.log("🏷️ Toggle response status:", res.status);
-      
-      if (res.ok) {
-        if (onToggleSoldOut) {
-          onToggleSoldOut(product._id, newSoldOutStatus);
-        }
-        alert(`✅ Product ${newSoldOutStatus ? 'marked as Sold Out' : 'marked as Available'}`);
-      } else {
-        if (res.status === 401) {
-          alert("❌ Unauthorized: Please login as admin again");
-        } else {
-          alert(`❌ Failed to update: ${res.status}`);
-        }
-      }
-    } catch (err) {
-      console.error("Toggle sold out failed", err);
-      alert("❌ Network error: Failed to update product status");
-    }
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (product.soldOut) {
-      alert("❌ This product is sold out and cannot be added to cart");
+  const handleConfirmAdd = () => {
+    if (availableSizes.length > 0 && !selectedSize) {
+      alert("Please select a size");
       return;
     }
-    
+    if (availableColors.length > 0 && !selectedColor) {
+      alert("Please select a color");
+      return;
+    }
+
     addToCart({
       _id: product._id,
       name: product.name,
       price: product.price,
-      quantity: 1,
       image: firstImage,
+      size: selectedSize || undefined,
+      color: selectedColor || undefined,
+      quantity: 1,
     });
-    alert("🛒 Product added to cart!");
+
+    alert(`⚡ ${product.name} added to cart!`);
+    setShowAddModal(false);
+    setSelectedSize(null);
+    setSelectedColor(null);
   };
 
   return (
     <>
       <div
-        className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden flex flex-col w-72 relative ${
-          product.soldOut ? 'opacity-70' : ''
+        className={`relative group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 ${
+          product.soldOut ? "opacity-70" : ""
         }`}
-        onClick={() => {
-          setIsModalOpen(true);
-          if (onClick) onClick();
-        }}
       >
+        {/* SOLD OUT Badge */}
         {product.soldOut && (
-          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold z-10">
+          <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold z-10 shadow-md">
             SOLD OUT
           </div>
         )}
-        
-        <div className="relative w-full h-80 bg-gray-100 flex items-center justify-center overflow-hidden">
+
+        {/* Image Section */}
+        <div
+          className="relative w-full aspect-[4/5] bg-gray-50 rounded-b-none overflow-hidden shadow-sm cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
+        >
           <img
             src={firstImage}
             alt={product.name}
-            className={`h-full w-full object-contain transition-transform duration-300 hover:scale-105 ${
-              product.soldOut ? 'opacity-80' : ''
-            }`}
+            className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
           />
-        </div>
 
-        <div className="p-5 flex flex-col flex-1">
-          <h3 className="text-xl font-semibold mb-1 text-gray-800">{product.name}</h3>
-          {product.category && <p className="text-gray-500">{product.category}</p>}
-          {product.color && <p className="text-gray-500">Color: {product.color}</p>}
-          <p className="text-gray-900 font-bold text-xl mb-4">${product.price}</p>
-
-          <div className="flex gap-2 mt-auto">
-            <button
-              className={`flex-1 font-medium py-2 px-4 rounded-lg transition ${
-                product.soldOut 
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                  : 'bg-green-500 hover:bg-green-600 text-white'
-              }`}
-              onClick={handleAddToCart}
-              disabled={product.soldOut}
-            >
-              {product.soldOut ? 'Sold Out' : 'Add to Cart'}
-            </button>
-
-            {isAdmin && (
-              <div className="flex gap-1">
-                <button
-                  className={`px-3 rounded-lg ${
-                    product.soldOut 
-                      ? 'bg-yellow-500 hover:bg-yellow-600' 
-                      : 'bg-blue-500 hover:bg-blue-600'
-                  } text-white`}
-                  onClick={handleToggleSoldOut}
-                  title={product.soldOut ? 'Mark as Available' : 'Mark as Sold Out'}
-                >
-                  {product.soldOut ? '🔄' : '🏷️'}
-                </button>
-                
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 rounded-lg"
-                  onClick={handleDelete}
-                >
-                  🗑
-                </button>
-              </div>
-            )}
+          {/* Eye Icon */}
+          <div
+            className="absolute inset-0 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300"
+            title="Click to see images"
+          >
+            <div className="bg-opacity-60 text-white rounded-full p-3">
+              <Eye size={36} />
+            </div>
           </div>
+
+          {/* Quick Shop Button */}
+          {!isAdmin && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!product.soldOut) setShowAddModal(true);
+              }}
+              disabled={product.soldOut}
+              className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-2 rounded-full font-medium text-white text-xs sm:text-sm shadow-lg backdrop-blur-sm transition-all duration-300 transform ${
+                product.soldOut
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90"
+              } ${
+                // Always visible on mobile, hover on desktop
+                "sm:opacity-0 sm:group-hover:opacity-100 opacity-100"
+              }`}
+            >
+              {product.soldOut ? "Sold Out" : "⚡ Quick Shop"}
+            </button>
+          )}
         </div>
+
+        {/* Product Info */}
+        <div className="p-3 text-left">
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+            {product.name}
+          </h3>
+          <p className="text-lg font-bold text-black mb-1">
+            PKR {product.price}
+          </p>
+        </div>
+
+        {/* Admin Controls */}
+        {isAdmin && (
+          <div className="flex justify-center items-center gap-2 py-3 bg-gray-50 border-t">
+            <button
+              title="Manage Colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsColorModalOpen(true);
+              }}
+              className="p-2 rounded-lg bg-gradient-to-r from-blue-200 to-blue-500 text-white text-sm hover:scale-105 transition"
+            >
+              🎨
+            </button>
+            <button
+              title="Manage Sizes"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsSizeModalOpen(true);
+              }}
+              className="p-2 rounded-lg bg-gradient-to-r from-blue-200 to-blue-500 text-white text-sm hover:scale-105 transition"
+            >
+              📏
+            </button>
+            <button
+              title={product.soldOut ? "Mark as Available" : "Mark as Sold Out"}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onToggleSoldOut)
+                  onToggleSoldOut(product._id, !product.soldOut);
+              }}
+              className={`p-2 rounded-lg text-white text-sm hover:scale-105 transition ${
+                product.soldOut
+                  ? "bg-gradient-to-r from-yellow-500 to-amber-500"
+                  : "bg-gradient-to-r from-blue-500 to-cyan-500"
+              }`}
+            >
+              {product.soldOut ? "🔄" : "🏷️"}
+            </button>
+            <button
+              title="Delete Product"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm("Delete this product?"))
+                  fetch(`https://dabeez-backend.fly.dev/products/${product._id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${getToken()}` },
+                  }).then(() => window.location.reload());
+              }}
+              className="p-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm hover:scale-105 transition"
+            >
+              🗑
+            </button>
+          </div>
+        )}
       </div>
 
+      {/* Product Detail Modal */}
       {isModalOpen && (
         <ProductModal
           product={product}
@@ -209,6 +223,104 @@ const ProductCard: React.FC<Props> = ({ product, isAdmin, onUpload, onClick, onT
           onUpload={onUpload}
           onClose={() => setIsModalOpen(false)}
         />
+      )}
+
+      {/* Size Management Modal */}
+      {isSizeModalOpen && (
+        <SizeManagementModal
+          product={product}
+          onClose={() => setIsSizeModalOpen(false)}
+          onSizeUpdate={(id, s) => {
+            if (onSizeUpdate) onSizeUpdate(id, s);
+            setIsSizeModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* Color Management Modal */}
+      {isColorModalOpen && (
+        <ColorManagementModal
+          product={product}
+          onClose={() => setIsColorModalOpen(false)}
+          onColorUpdate={(id, c) => {
+            if (onColorUpdate) onColorUpdate(id, c);
+            setIsColorModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* Quick Shop (Add to Cart) Modal */}
+      {showAddModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={() => setShowAddModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              Select Options
+            </h2>
+
+            {availableSizes.length > 0 && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Size:</p>
+                <div className="flex flex-wrap gap-2">
+                  {availableSizes.map((s) => (
+                    <button
+                      key={s.size}
+                      onClick={() => setSelectedSize(s.size)}
+                      className={`px-3 py-1 text-sm rounded-md border transition-all ${
+                        selectedSize === s.size
+                          ? "bg-blue-500 text-white border-blue-600"
+                          : "bg-gray-50 border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {s.size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {availableColors.length > 0 && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Color:</p>
+                <div className="flex flex-wrap gap-2">
+                  {availableColors.map((c) => (
+                    <button
+                      key={c.color}
+                      onClick={() => setSelectedColor(c.color)}
+                      className={`px-3 py-1 text-sm rounded-md border transition-all ${
+                        selectedColor === c.color
+                          ? "bg-blue-500 text-white border-blue-600"
+                          : "bg-gray-50 border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {c.color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAdd}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

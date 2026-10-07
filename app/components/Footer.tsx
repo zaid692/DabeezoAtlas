@@ -19,14 +19,12 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold text-white mb-4">Contact</h3>
           <ul className="space-y-3 text-sm">
             <li className="flex items-center gap-2">
-              <Phone size={16} /> +123 456 7890
+              <Phone size={16} /> +92 3150186980
             </li>
             <li className="flex items-center gap-2">
-              <Mail size={16} /> support@example.com
+              <Mail size={16} /> dabeezoatlas@gmail.com
             </li>
-            <li className="flex items-center gap-2">
-              <MapPin size={16} /> 123 Main Street, New York
-            </li>
+          
           </ul>
         </div>
 
@@ -48,7 +46,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} MyStore. All rights reserved.
+        © {new Date().getFullYear()} Dabeez Store. All rights reserved.
       </div>
     </footer>
   );

@@ -1,27 +1,49 @@
+'use client';
 import React from "react";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import Hero from "../components/Hero";
-import ProductCard from "../components/ProductCard";
-import ProductsPage from "../product/page";
+import Footer from "../components/Footer";
+import Categories from "../components/categories";
+import { useAuth } from "../hooks/useath";
+import FeaturedProducts from "../components/FeaturedProducts";
 
-const featuredProducts = [
-  { id: 1, name: "T-Shirt", price: 25, image: "https://via.placeholder.com/400x500?text=T-Shirt" },
-  { id: 2, name: "Jeans", price: 40, image: "https://via.placeholder.com/400x500?text=Jeans" },
-  { id: 3, name: "Jacket", price: 60, image: "https://via.placeholder.com/400x500?text=Jacket" },
-  { id: 4, name: "Sneakers", price: 70, image: "https://via.placeholder.com/400x500?text=Sneakers" },
-];
+export default function LandingPage() {
+  const { isAdmin, loading } = useAuth();
 
-const LandingPage: React.FC = () => {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gray-100">
+    <div className="min-h-screen bg-white relative">
       <Navbar />
       <Hero />
-    <ProductsPage />  {/* Navbar skipped here */}
 
+      {/* Categories Section */}
+      <Categories isAdmin={isAdmin} />
+
+      
+             <FeaturedProducts/>
+      {/* Other sections can go here */}
       <Footer />
+
+      {/* 🌿 Floating WhatsApp Icon */}
+      <a
+        href="https://wa.me/3150186980" // 🔹 Replace with your own number
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 left-6 z-50"
+      >
+        <img
+          src="https://dabeez.b-cdn.net/whatsapp.png" // 🔹 Your Bunny.net image URL
+          alt="Chat on WhatsApp"
+          className="w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform duration-300"
+        />
+      </a>
     </div>
   );
-};
-
-export default LandingPage;
+}

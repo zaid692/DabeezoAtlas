@@ -6,7 +6,7 @@ export default function AdminLogin() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -20,7 +20,7 @@ export default function AdminLogin() {
     }
 
     try {
-      const res = await fetch('https://dabeez-backend.fly.dev/auth/login', { // ✅ API replaced
+      const res = await fetch(`https://dabeez-backend.fly.dev/auth/login`, { // ✅ API replaced
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

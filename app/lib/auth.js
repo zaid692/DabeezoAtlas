@@ -1,6 +1,6 @@
 // lib/auth.js
 const TOKEN_KEY = 'adminToken';
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // ✅ Store token after successful login
 export const login = (token) => {
   localStorage.setItem(TOKEN_KEY, token);
@@ -23,7 +23,7 @@ export const isAuthenticated = async () => {
   if (!token) return false;
 
   try {
-    const res = await fetch('http://localhost:3001/auth/verify', {
+    const res = await fetch(`https://dabeez-backend.fly.dev/auth/verify`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return res.ok; // true if 200 OK

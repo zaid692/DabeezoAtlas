@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 
 // Metadata (for SEO)
 export const metadata: Metadata = {
-  title: "My Next.js App",
-  description: "A modern Next.js app with slider hero and cart system",
+  title: "Dabeez O Atlas",
+  description: "A platform of Elite Fashion",
 };
 
 // Root layout

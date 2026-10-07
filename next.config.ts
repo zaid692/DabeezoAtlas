@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // CSP headers removed temporarily for testing
+  // No headers for development
 };
 
 export default nextConfig;
