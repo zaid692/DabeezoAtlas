@@ -137,19 +137,20 @@ export default function ProductsPage() {
         )}
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 justify-items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {products.length > 0 ? (
             products.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                isAdmin={isAdmin}
-                onUpload={handleUpload}
-                onClick={() => setSelectedProduct(product)}
-                onToggleSoldOut={() => {}}
-                onSizeUpdate={() => {}}
-                onColorUpdate={() => {}}
-              />
+              <div key={product._id} className="w-full flex justify-center">
+                <ProductCard
+                  product={product}
+                  isAdmin={isAdmin}
+                  onUpload={handleUpload}
+                  onClick={() => setSelectedProduct(product)}
+                  onToggleSoldOut={() => {}}
+                  onSizeUpdate={() => {}}
+                  onColorUpdate={() => {}}
+                />
+              </div>
             ))
           ) : (
             <div className="col-span-full text-center py-12">

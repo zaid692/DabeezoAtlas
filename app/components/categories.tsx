@@ -7,6 +7,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getToken } from "../lib/auth";
 import ProductCard from "../components/ProductCard";
+import ProductImage from "../components/ProductImage";
+import { Cloud } from "lucide-react";
 
 interface Category {
   _id: string;
@@ -548,38 +550,78 @@ export default function ModernCategories({ isAdmin }: CategoriesProps) {
                       onClick={() => handleCategoryClick(category)} 
                     >
                       {/* Category Image - Fixed Height */}
-                      <div 
-                        className="h-48 bg-cover bg-center relative flex-shrink-0"
-                        style={{ backgroundImage: `url(${category.image || "/placeholder.png"})` }}
-                      >
-                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"></div>
-                        
-                        {/* Admin Actions */}
-                        {isAdmin && (
-                          <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedCategory(category);
-                              }}
-                              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors shadow-lg"
-                              title="Manage Products"
-                            >
-                              📦
-                            </button>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteCategory(category._id);
-                              }}
-                              className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors shadow-lg"
-                              title="Delete Category"
-                            >
-                              🗑️
-                            </button>
+                      {(!category.image || category.image.includes("b-cdn.net") || category.image === "/placeholder.png") ? (
+                        <div className="h-48 relative flex-shrink-0 bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 flex flex-col items-center justify-center p-4 text-center border-b border-gray-100">
+                          <div className="w-10 h-10 rounded-xl bg-white shadow-2xs border border-gray-200 flex items-center justify-center text-gray-400 mb-2">
+                            <Cloud className="w-5 h-5" />
                           </div>
-                        )}
-                      </div>
+                          <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
+                            Cloud Storage
+                          </span>
+                          <span className="text-[11px] text-gray-400 font-medium">
+                            Cloud storage buy required
+                          </span>
+                          
+                          {/* Admin Actions */}
+                          {isAdmin && (
+                            <div className="absolute top-3 right-3 flex gap-2 z-10">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedCategory(category);
+                                }}
+                                className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors shadow-lg"
+                                title="Manage Products"
+                              >
+                                📦
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteCategory(category._id);
+                                }}
+                                className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors shadow-lg"
+                                title="Delete Category"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div 
+                          className="h-48 bg-cover bg-center relative flex-shrink-0"
+                          style={{ backgroundImage: `url(${category.image})` }}
+                        >
+                          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300"></div>
+                          
+                          {/* Admin Actions */}
+                          {isAdmin && (
+                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedCategory(category);
+                                }}
+                                className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors shadow-lg"
+                                title="Manage Products"
+                              >
+                                📦
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteCategory(category._id);
+                                }}
+                                className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors shadow-lg"
+                                title="Delete Category"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* 🟢 UPDATED: Fixed height content area for consistent sizing */}
                       <div className="p-4 text-center flex flex-col justify-between flex-grow min-h-[100px]">
@@ -699,10 +741,11 @@ export default function ModernCategories({ isAdmin }: CategoriesProps) {
                       .map(product => (
                         <div key={product._id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={product.images?.[0] || "/placeholder.png"} 
+                            <ProductImage 
+                              src={product.images?.[0]} 
                               alt={product.name}
-                              className="w-12 h-12 object-cover rounded"
+                              size="thumbnail"
+                              containerClassName="w-12 h-12 rounded overflow-hidden"
                             />
                             <div>
                               <div className="font-medium text-sm">{product.name}</div>
@@ -735,10 +778,11 @@ export default function ModernCategories({ isAdmin }: CategoriesProps) {
                       return product ? (
                         <div key={productId} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={product.images?.[0] || "/placeholder.png"} 
+                            <ProductImage 
+                              src={product.images?.[0]} 
                               alt={product.name}
-                              className="w-12 h-12 object-cover rounded"
+                              size="thumbnail"
+                              containerClassName="w-12 h-12 rounded overflow-hidden"
                             />
                             <div>
                               <div className="font-medium text-sm">{product.name}</div>
@@ -802,19 +846,20 @@ export default function ModernCategories({ isAdmin }: CategoriesProps) {
           </div>
 
           {/* 🟢 UPDATED: Products Grid - Show 2+ on mobile */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full">
             {categoryProducts.length > 0 ? (
               categoryProducts.map((product) => (
-                <ProductCard 
-                  key={product._id} 
-                  product={product}
-                  isAdmin={isAdmin}
-                  onUpload={handleUpload}
-                  onClick={() => {}}
-                  onToggleSoldOut={handleToggleSoldOut}
-                  onSizeUpdate={handleSizeUpdate}
-                  onColorUpdate={handleColorUpdate}
-                />
+                <div key={product._id} className="w-full flex justify-center">
+                  <ProductCard 
+                    product={product}
+                    isAdmin={isAdmin}
+                    onUpload={handleUpload}
+                    onClick={() => {}}
+                    onToggleSoldOut={handleToggleSoldOut}
+                    onSizeUpdate={handleSizeUpdate}
+                    onColorUpdate={handleColorUpdate}
+                  />
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center py-16">

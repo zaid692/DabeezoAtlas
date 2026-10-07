@@ -3,6 +3,7 @@
 import { useCart } from "../components/CartContext";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import ProductImage from "../components/ProductImage";
 
 interface CartItem {
   _id: string;
@@ -155,10 +156,11 @@ const CheckoutPage: React.FC = () => {
                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                     >
                       <div className="flex items-center space-x-4 flex-1">
-                        <img
-                          src={item.image || "/placeholder.png"}
+                        <ProductImage
+                          src={item.image}
                           alt={item.name}
-                          className="w-16 h-16 object-cover rounded-lg"
+                          size="thumbnail"
+                          containerClassName="w-16 h-16 rounded-lg"
                         />
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-800">

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useCart } from "../components/CartContext";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import ProductImage from "../components/ProductImage";
 import { useAuth } from "../hooks/useath";
 import {
   Plus,
@@ -123,10 +124,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
                     className="p-6 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex gap-4">
-                      <img
-                        src={item.image || "/placeholder.png"}
+                      <ProductImage
+                        src={item.image}
                         alt={item.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shadow-sm"
+                        size="thumbnail"
+                        containerClassName="w-20 h-20 sm:w-24 sm:h-24 rounded-xl shadow-xs"
                       />
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>

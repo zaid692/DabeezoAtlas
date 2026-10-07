@@ -329,22 +329,23 @@ export default function ProductsPage() {
         )}
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 px-2 sm:px-0">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 px-2 sm:px-0 w-full">
           {sortedProducts && sortedProducts.length > 0 ? (
             sortedProducts.map(
               (product) =>
                 product &&
                 product._id && (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                    isAdmin={isAdmin}
-                    onUpload={handleUpload}
-                    onClick={() => setSelectedProduct(product)}
-                    onToggleSoldOut={handleToggleSoldOut}
-                    onSizeUpdate={handleSizeUpdate}
-                    onColorUpdate={handleColorUpdate}
-                  />
+                  <div key={product._id} className="w-full flex justify-center">
+                    <ProductCard
+                      product={product}
+                      isAdmin={isAdmin}
+                      onUpload={handleUpload}
+                      onClick={() => setSelectedProduct(product)}
+                      onToggleSoldOut={handleToggleSoldOut}
+                      onSizeUpdate={handleSizeUpdate}
+                      onColorUpdate={handleColorUpdate}
+                    />
+                  </div>
                 )
             )
           ) : (

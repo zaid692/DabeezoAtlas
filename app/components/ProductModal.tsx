@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
+import ProductImage from "./ProductImage";
 import { getToken } from "../lib/auth";
 import { 
   X, 
@@ -239,10 +240,11 @@ export default function ProductModal({
                           }`}
                           onClick={() => handleThumbnailClick(img)}
                         >
-                          <img
+                          <ProductImage
                             src={img}
                             alt={`thumbnail-${idx}`}
-                            className="w-full h-full object-cover"
+                            size="thumbnail"
+                            containerClassName="w-full h-full"
                           />
                         </div>
                         
@@ -277,19 +279,22 @@ export default function ProductModal({
                     <div className="bg-gray-50 rounded-xl p-4 lg:p-8 flex items-center justify-center min-h-[400px]">
                       {mainImage ? (
                         <div className="relative w-full h-full flex items-center justify-center">
-                          <img
+                          <ProductImage
                             src={mainImage}
                             alt="main-product"
-                            className="max-h-[350px] max-w-full object-contain cursor-pointer transition-transform hover:scale-105"
+                            size="modal"
+                            containerClassName="w-full h-full"
                             onClick={() => handleImageClick(mainImage)}
                           />
                           
-                          <button
-                            onClick={() => handleImageClick(mainImage)}
-                            className="absolute bottom-4 right-4 bg-black/50 text-white p-2 rounded-lg hover:bg-black/70 transition-colors"
-                          >
-                            <ZoomIn className="w-5 h-5" />
-                          </button>
+                          {(!mainImage.includes("b-cdn.net") && mainImage !== "/placeholder.png" && mainImage !== "/placeholder.svg") && (
+                            <button
+                              onClick={() => handleImageClick(mainImage)}
+                              className="absolute bottom-4 right-4 bg-black/50 text-white p-2 rounded-lg hover:bg-black/70 transition-colors"
+                            >
+                              <ZoomIn className="w-5 h-5" />
+                            </button>
+                          )}
                           
                           {isAdmin && (
                             <button
@@ -457,12 +462,14 @@ export default function ProductModal({
           onClick={handleCloseImageModal}
         >
           <div className="relative w-full h-full flex items-center justify-center max-w-7xl max-h-full">
-            <img
-              src={selectedImage}
-              alt="zoomed-product"
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl">
+              <ProductImage
+                src={selectedImage}
+                alt="zoomed-product"
+                size="modal"
+                containerClassName="w-full"
+              />
+            </div>
             
             {/* Action Buttons */}
             <div className="absolute top-4 right-4 flex gap-2">

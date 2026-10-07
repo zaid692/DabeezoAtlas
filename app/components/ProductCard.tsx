@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import ProductImage from "./ProductImage";
 import ProductModal from "./ProductModal";
 import SizeManagementModal from "./SIzeMangementModel";
 import ColorManagementModal from "./ColorManagementModal";
@@ -61,7 +62,7 @@ const ProductCard: React.FC<Props> = ({
   const firstImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : "/placeholder.png";
+      : "/placeholder.svg";
 
   const availableSizes = product.sizes?.filter((s) => s.available) || [];
   const availableColors = product.colors?.filter((c) => c.available) || [];
@@ -95,7 +96,7 @@ const ProductCard: React.FC<Props> = ({
   return (
     <>
       <div
-        className={`relative group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 ${
+        className={`relative group w-full max-w-sm mx-auto bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col justify-between ${
           product.soldOut ? "opacity-70" : ""
         }`}
       >
@@ -111,19 +112,20 @@ const ProductCard: React.FC<Props> = ({
           className="relative w-full aspect-[4/5] bg-gray-50 rounded-b-none overflow-hidden shadow-sm cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         >
-          <img
+          <ProductImage
             src={firstImage}
             alt={product.name}
-            className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+            aspectRatio="aspect-[4/5]"
+            size="card"
           />
 
           {/* Eye Icon */}
           <div
-            className="absolute inset-0 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
             title="Click to see images"
           >
-            <div className="bg-opacity-60 text-white rounded-full p-3">
-              <Eye size={36} />
+            <div className="bg-black/40 text-white rounded-full p-3 backdrop-blur-xs">
+              <Eye size={32} />
             </div>
           </div>
 
