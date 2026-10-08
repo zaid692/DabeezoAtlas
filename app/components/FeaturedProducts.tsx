@@ -137,10 +137,10 @@ export default function ProductsPage() {
         )}
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5 w-full items-stretch">
           {products.length > 0 ? (
             products.map((product) => (
-              <div key={product._id} className="w-full flex justify-center">
+              <div key={product._id} className="w-full h-full flex justify-center">
                 <ProductCard
                   product={product}
                   isAdmin={isAdmin}

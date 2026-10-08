@@ -846,10 +846,10 @@ export default function ModernCategories({ isAdmin }: CategoriesProps) {
           </div>
 
           {/* 🟢 UPDATED: Products Grid - Show 2+ on mobile */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full items-stretch">
             {categoryProducts.length > 0 ? (
               categoryProducts.map((product) => (
-                <div key={product._id} className="w-full flex justify-center">
+                <div key={product._id} className="w-full h-full flex justify-center">
                   <ProductCard 
                     product={product}
                     isAdmin={isAdmin}

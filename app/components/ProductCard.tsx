@@ -96,7 +96,7 @@ const ProductCard: React.FC<Props> = ({
   return (
     <>
       <div
-        className={`relative group w-full max-w-sm mx-auto bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col justify-between ${
+        className={`relative group w-full h-full max-w-sm mx-auto bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col justify-between ${
           product.soldOut ? "opacity-70" : ""
         }`}
       >
@@ -109,13 +109,15 @@ const ProductCard: React.FC<Props> = ({
 
         {/* Image Section */}
         <div
-          className="relative w-full aspect-[4/5] bg-gray-50 rounded-b-none overflow-hidden shadow-sm cursor-pointer"
+          className="relative w-full aspect-[4/5] bg-gray-50 rounded-b-none overflow-hidden shadow-sm cursor-pointer flex-shrink-0"
+          style={{ aspectRatio: "4/5" }}
           onClick={() => setIsModalOpen(true)}
         >
           <ProductImage
             src={firstImage}
             alt={product.name}
-            aspectRatio="aspect-[4/5]"
+            aspectRatio="none"
+            containerClassName="w-full h-full"
             size="card"
           />
 
@@ -152,18 +154,20 @@ const ProductCard: React.FC<Props> = ({
         </div>
 
         {/* Product Info */}
-        <div className="p-3 text-left">
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">
-            {product.name}
-          </h3>
-          <p className="text-lg font-bold text-black mb-1">
-            PKR {product.price}
-          </p>
+        <div className="p-3 sm:p-4 text-left flex-1 flex flex-col justify-between">
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1 line-clamp-1" title={product.name}>
+              {product.name}
+            </h3>
+            <p className="text-base sm:text-lg font-bold text-black mb-1">
+              PKR {product.price}
+            </p>
+          </div>
         </div>
 
         {/* Admin Controls */}
         {isAdmin && (
-          <div className="flex justify-center items-center gap-2 py-3 bg-gray-50 border-t">
+          <div className="flex justify-center items-center gap-2 py-3 bg-gray-50 border-t mt-auto">
             <button
               title="Manage Colors"
               onClick={(e) => {

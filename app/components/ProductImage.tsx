@@ -121,7 +121,10 @@ export default function ProductImage({
   return (
     <div
       onClick={onClick}
-      className={`relative w-full ${aspectRatio !== "none" ? aspectRatio : "aspect-[4/5]"} bg-slate-100 rounded-b-none overflow-hidden select-none flex-shrink-0 ${containerClassName}`}
+      className={`relative w-full ${
+        aspectRatio !== "none" ? aspectRatio : "h-full"
+      } bg-slate-100 rounded-b-none overflow-hidden select-none flex-shrink-0 ${containerClassName}`}
+      style={aspectRatio !== "none" ? { aspectRatio: "4/5" } : undefined}
     >
       {hasError ? (
         <div className="w-full h-full min-h-full flex flex-col items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-slate-50 via-gray-100 to-slate-200/90 text-center relative overflow-hidden transition-all duration-300">
@@ -153,7 +156,7 @@ export default function ProductImage({
           src={src || "/placeholder.svg"}
           alt={alt}
           onError={() => setHasError(true)}
-          className={`object-cover w-full h-full ${
+          className={`object-cover w-full h-full block ${
             showHoverEffect ? "group-hover:scale-110 transition-transform duration-500" : ""
           } ${className}`}
         />
